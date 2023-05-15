@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Alphabet Phrase</title>
+    <style>
+        .letter-image {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+
+        .shifted {
+            text-transform: uppercase;
+        }
+
+        .blank-box {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            background-color: #ccc;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <label for="phrase-input">Enter a phrase:</label>
+        <textarea id="phrase-input" rows="5"></textarea>
+    </div>
+    <div id="phrase-container"></div>
+
+    <script>
+        // Define the path to the folder containing the letter images
+        var imagePath = 'D:/Meu repositorio/Estudos/auladesign/imagensletras/';
+
+        // Define the mapping of letters to image filenames
+        var letterImages = {
+            'a': 'a.jpg',
+            'b': 'b.jpg',
+            'c': 'c.jpg',
+            'd': 'd.jpg',
+            'e': 'e.jpg',
+            'f': 'f.jpg',
+            'g': 'g.jpg',
+            'h': 'h.jpg',
+            'i': 'i.jpg',
+            'j': 'j.jpg',
+            'k': 'k.jpg',
+            'l': 'l.jpg',
+            'm': 'm.jpg',
+            'n': 'n.jpg',
+            'o': 'o.jpg',
+            'p': 'p.jpg',
+            'q': 'q.jpg',
+            'r': 'r.jpg',
+            's': 's.jpg',
+            't': 't.jpg',
+            'u': 'u.jpg',
+            'v': 'v.jpg',
+            'w': 'w.jpg',
+            'x': 'x.jpg',
+            'y': 'y.jpg',
+            'z': 'z.jpg'
+        };
+
+        // Function to create and display image elements for each letter in the phrase
+        function displayPhraseAsImages() {
+            var phraseInput = document.getElementById('phrase-input');
+            var lines = phraseInput.value.split('\n');
+
+            var phraseContainer = document.getElementById('phrase-container');
+            phraseContainer.innerHTML = ''; // Clear any previous content
+
+            for (var j = 0; j < lines.length; j++) {
+                var line = lines[j];
+
+                for (var i = 0; i < line.length; i++) {
+                    var letter = line[i].toLowerCase();
+                    if (letter in letterImages) {
+                        var imageFilename = imagePath + letterImages[letter];
+                        var imageElement = document.createElement('img');
+                        imageElement.src = imageFilename;
+                        imageElement.alt = letter;
+                        imageElement.classList.add('letter-image');
+                        phraseContainer.appendChild(imageElement);
+                    } else if (letter === ' ') {
+                        var blankBox = document.createElement('div');
+                        blankBox.classList.add('blank-box');
+                        phraseContainer.appendChild(blankBox);
+                    } else {
+                        console.warn('No image found for letter ' + letter);
+                    }
+                }
+
+                phraseContainer.appendChild(document.createElement('br')); // Add line break after each line
+            }
+        }
+
+
+
+        var phraseInput = document.getElementById('phrase-input');
+        phraseInput.addEventListener('input', displayPhraseAsImages);
+        window.addEventListener('keydown', applyShiftEffect);
+        window.addEventListener('keyup', applyShiftEffect);
+    </script>
+</body>
+</html>

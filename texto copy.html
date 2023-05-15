@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Alphabet Phrase</title>
+    <style>
+        .letter-image {
+            display: inline-block;
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+        }
+
+        .shifted {
+            text-transform: uppercase;
+        }
+
+        .blank-box {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            background-color: #cccccc00;
+            margin: 10px;
+        }
+
+        .bordered-phrase {
+            border: 2px solid black;
+            padding: 50px;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <label for="phrase-input">Digite aqui algo (use apenas a-z sem acentos):</label>
+        <textarea id="phrase-input" rows="5" oninput="displayPhraseAsImages()"></textarea>
+    </div>
+    <div class="bordered-phrase" id="bordered-phrase-container"></div>
+    <div style="position: absolute; bottom: 30px; right: 30px;">builtbygus.com</div>
+
+    <br>
+    <button onclick="saveAsImage()">Salvar frase como imagem</button>
+
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script>
+        var currentPath = window.location.href;
+        var currentDirectory = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
+        var imagePath = currentDirectory;
+
+        var letterImages = {
+            'a': 'a.jpg',
+            'b': 'b.jpg',
+            'c': 'c.jpg',
+            'd': 'd.jpg',
+            'e': 'e.jpg',
+            'f': 'f.jpg',
+            'g': 'g.jpg',
+            'h': 'h.jpg',
+            'i': 'i.jpg',
+            'j': 'j.jpg',
+            'k': 'k.jpg',
+            'l': 'l.jpg',
+            'm': 'm.jpg',
+            'n': 'n.jpg',
+            'o': 'o.jpg',
+            'p': 'p.jpg',
+            'q': 'q.jpg',
+            'r': 'r.jpg',
+            's': 's.jpg',
+            't': 't.jpg',
+            'u': 'u.jpg',
+            'v': 'v.jpg',
+            'w': 'w.jpg',
+            'x': 'x.jpg',
+            'y': 'y.jpg',
+            'z': 'z.jpg'
+        };
+
+        function displayPhraseAsImages() {
+            var phraseInput = document.getElementById('phrase-input').value;
+            var borderedPhraseContainer = document.getElementById('bordered-phrase-container');
+            borderedPhraseContainer.innerHTML = ''; // Clear any previous content
+
+            var lines = phraseInput.split('\n');
+            for (var j = 0; j < lines.length; j++) {
+                var line = lines[j];
+                var lineContainer = document.createElement('div');
+                lineContainer.classList.add('line-container');
+
+                for (var i = 0; i < line.length; i++) {
+                    var letter = line[i].toLowerCase();
+                    if (letter in letterImages) {
+                        var imageFilename = imagePath + letterImages[letter];
+                        var imageElement = document.createElement('img');
+                        imageElement.src = imageFilename;
+                        imageElement.alt = letter;
+                        imageElement.classList.add('letter-image');
+                        lineContainer.appendChild(imageElement);
+                    }   else if (letter === ' ') {
+                        var blankBox = document.createElement('div');
+                        blankBox.classList.add('blank-box');
+                        lineContainer.appendChild(blankBox);
+                    } else {
+                        console.warn('No image found for letter ' + letter);
+                    }
+                }
+
+                borderedPhraseContainer.appendChild(lineContainer);
+            }
+        }
+
+        function saveAsImage() {
+            var borderedPhrase = document.querySelector('.bordered-phrase');
+
+            // Use html2canvas library to capture the borderedPhrase container as an image
+            html2canvas(borderedPhrase).then(function(canvas) {
+                var ctx = canvas.getContext('2d');
+
+                // Add the small text to the canvas
+                ctx.fillStyle = 'black';
+                ctx.font = '12px Arial';
+                ctx.fillText('builtbygus.com', canvas.width - 110, canvas.height - 10);
+
+                // Convert the canvas to a data URL
+                var dataURL = canvas.toDataURL('image/png');
+
+                // Create a temporary link element
+                var downloadLink = document.createElement('a');
+                downloadLink.href = dataURL;
+                downloadLink.download = 'frase.png';
+
+                // Programmatically trigger the click event to download the image
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            });
+        }
+    </script>
+</body>
+</html>
