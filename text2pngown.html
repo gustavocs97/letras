@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Texto para JPG</title>
+    <style>
+        .letter-image {
+            display: inline-block;
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+        }
+
+        .shifted {
+            text-transform: uppercase;
+        }
+
+        .blank-box {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            background-color: #cccccc00;
+            margin: 10px;
+        }
+
+        .bordered-phrase {
+            border: 2px solid black;
+            padding: 50px;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <label for="phrase-input">Digite aqui (A-Z, sem acentos):</label>
+        <textarea id="phrase-input" rows="5" oninput="displayPhraseAsImages()"></textarea>
+    </div>
+
+    <div id="image-upload-container">
+        <!-- Caixas de upload de imagem -->
+    </div>
+
+    <div class="bordered-phrase" id="bordered-phrase-container"></div>
+    <div style="position: absolute; bottom: 30px; right: 30px;">builtbygus.com</div>
+
+    <br>
+    <button class="save-button">Salve a frase como imagem</button>
+
+    <script src="html2canvas.min.js"></script>
+    <script>
+        var imagePath = '';
+        var uploadedImages = {};
+
+        function handleImageUpload(letter) {
+            var fileInput = document.getElementById('upload-' + letter);
+            var file = fileInput.files[0];
+
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedImages[letter] = e.target.result;
+                    displayPhraseAsImages();
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        var letterImages = {
+            'a': 'a.jpg',
+            'b': 'b.jpg',
+            'c': 'c.jpg',
+            'd': 'd.jpg',
+            'e': 'e.jpg',
+            'f': 'f.jpg',
+            'g': 'g.jpg',
+            'h': 'h.jpg',
+            'i': 'i.jpg',
+            'j': 'j.jpg',
+            'k': 'k.jpg',
+            'l': 'l.jpg',
+            'm': 'm.jpg',
+            'n': 'n.jpg',
+            'o': 'o.jpg',
+            'p': 'p.jpg',
+            'q': 'q.jpg',
+            'r': 'r.jpg',
+            's': 's.jpg',
+            't': 't.jpg',
+            'u': 'u.jpg',
+            'v': 'v.jpg',
+            'w': 'w.jpg',
+            'x': 'x.jpg',
+            'y': 'y.jpg',
+            'z': 'z.jpg'
+        };
+
+        function createImageUploadBoxes() {
+            var uploadContainer = document.getElementById('image-upload-container');
+
+            for (var letter in letterImages) {
+                var uploadBox = document.createElement('div');
+                uploadBox.classList.add('letter-upload');
+
+                var label = document.createElement('label');
+                label.textContent = 'Upload da imagem para ' + letter.toUpperCase() + ':';
+                var input = document.createElement('input');
+                input.type = 'file';
+                input.id = 'upload-' + letter;
+                input.accept = 'image/*';
+                input.onchange = (function(letter) {
+                    return function() {
+                        handleImageUpload(letter);
+                    }
+                })(letter);
+
+                label.appendChild(input);
+                uploadBox.appendChild(label);
+                uploadContainer.appendChild(uploadBox);
+            }
+        }
+
+        function displayPhraseAsImages() {
+            var phraseInput = document.getElementById('phrase-input').value;
+            var borderedPhraseContainer = document.getElementById('bordered-phrase-container');
+            borderedPhraseContainer.innerHTML = ''; // Limpar qualquer conteúdo anterior
+
+            var lines = phraseInput.split('\n');
+            for (var j = 0; j < lines.length; j++) {
+                var line = lines[j];
+
+                var lineContainer = document.createElement('div');
+                lineContainer.classList.add('line-container');
+
+                for (var i = 0; i < line.length; i++) {
+                    var letter = line[i].toLowerCase();
+
+                    if (letter in uploadedImages) {
+                        var imageElement = document.createElement('img');
+                        imageElement.src = uploadedImages[letter];
+                        imageElement.alt = letter;
+                        imageElement.classList.add('letter-image');
+                        lineContainer.appendChild(imageElement);
+                    } else if (letter in letterImages) {
+                        var imageFilename = imagePath + letterImages[letter];
+                        var imageElement = document.createElement('img');
+                        imageElement.src = imageFilename;
+                        imageElement.alt = letter;
+                        imageElement.classList.add('letter-image');
+                        lineContainer.appendChild(imageElement);
+                    } else if (letter === ' ') {
+                        var blankBox = document.createElement('div');
+                        blankBox.classList.add('blank-box');
+                        lineContainer.appendChild(blankBox);
+                    } else {
+                        console.warn('Nenhuma imagem encontrada para a letra ' + letter);
+                    }
+                }
+
+                borderedPhraseContainer.appendChild(lineContainer);
+            }
+        }
+
+        function saveAsImage() {
+            var borderedPhrase = document.querySelector('.bordered-phrase');
+
+            // Usar a biblioteca html2canvas para capturar o container borderedPhrase como uma imagem
+            html2canvas(borderedPhrase).then(function(canvas) {
+                var ctx = canvas.getContext('2d');
+
+                // Adicionar o texto da marca d'água ao canvas
+                var watermarkText = 'builtbygus.com';
+                ctx.fillStyle = 'black';
+                ctx.font = '12px Arial';
+                ctx.fillText(watermarkText, canvas.width - 110, canvas.height - 10);
+
+                // Converter o canvas para uma URL de dados
+                var dataURL = canvas.toDataURL('image/png');
+
+                // Criar um elemento de link temporário
+                var downloadLink = document.createElement('a');
+                downloadLink.href = dataURL;
+                downloadLink.download = 'frase-builtbygus.png';
+
+                // Disparar programaticamente o evento de clique para baixar a imagem
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            });
+        }
+
+        createImageUploadBoxes();
+
+        var button = document.querySelector('.save-button');
+        button.addEventListener('click', saveAsImage);
+    </script>
+</body>
+</html>
