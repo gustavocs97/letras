@@ -31,20 +31,18 @@
 </head>
 <body>
     <div>
-        <label for="phrase-input">Digite aqui algo (use apenas a-z sem acentos):</label>
+        <label for="phrase-input">Enter something here (use only a-z without accents):</label>
         <textarea id="phrase-input" rows="5" oninput="displayPhraseAsImages()"></textarea>
     </div>
     <div class="bordered-phrase" id="bordered-phrase-container"></div>
     <div style="position: absolute; bottom: 30px; right: 30px;">builtbygus.com</div>
 
     <br>
-    <button onclick="saveAsImage()">Salvar frase como imagem</button>
+    <button class="save-button">Save phrase as image</button>
 
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="html2canvas.min.js"></script>
     <script>
-        var currentPath = window.location.href;
-        var currentDirectory = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
-        var imagePath = currentDirectory;
+        var imagePath = '';
 
         var letterImages = {
             'a': 'a.jpg',
@@ -75,6 +73,7 @@
             'z': 'z.jpg'
         };
 
+
         function displayPhraseAsImages() {
             var phraseInput = document.getElementById('phrase-input').value;
             var borderedPhraseContainer = document.getElementById('bordered-phrase-container');
@@ -83,11 +82,13 @@
             var lines = phraseInput.split('\n');
             for (var j = 0; j < lines.length; j++) {
                 var line = lines[j];
+
                 var lineContainer = document.createElement('div');
                 lineContainer.classList.add('line-container');
 
                 for (var i = 0; i < line.length; i++) {
                     var letter = line[i].toLowerCase();
+
                     if (letter in letterImages) {
                         var imageFilename = imagePath + letterImages[letter];
                         var imageElement = document.createElement('img');
@@ -95,7 +96,7 @@
                         imageElement.alt = letter;
                         imageElement.classList.add('letter-image');
                         lineContainer.appendChild(imageElement);
-                    }   else if (letter === ' ') {
+                    } else if (letter === ' ') {
                         var blankBox = document.createElement('div');
                         blankBox.classList.add('blank-box');
                         lineContainer.appendChild(blankBox);
@@ -115,10 +116,11 @@
             html2canvas(borderedPhrase).then(function(canvas) {
                 var ctx = canvas.getContext('2d');
 
-                // Add the small text to the canvas
+                // Add the watermark text to the canvas
+                var watermarkText = 'builtbygus.com';
                 ctx.fillStyle = 'black';
                 ctx.font = '12px Arial';
-                ctx.fillText('builtbygus.com', canvas.width - 110, canvas.height - 10);
+                ctx.fillText(watermarkText, canvas.width - 110, canvas.height - 10);
 
                 // Convert the canvas to a data URL
                 var dataURL = canvas.toDataURL('image/png');
@@ -126,7 +128,7 @@
                 // Create a temporary link element
                 var downloadLink = document.createElement('a');
                 downloadLink.href = dataURL;
-                downloadLink.download = 'frase.png';
+                downloadLink.download = 'phrase.png';
 
                 // Programmatically trigger the click event to download the image
                 document.body.appendChild(downloadLink);
@@ -134,6 +136,9 @@
                 document.body.removeChild(downloadLink);
             });
         }
+
+        var button = document.querySelector('.save-button');
+        button.addEventListener('click', saveAsImage);
     </script>
 </body>
 </html>
